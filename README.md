@@ -5,19 +5,20 @@ atendimento. Preenchido no celular, sem app e sem cadastro.
 
 ## Como usar
 
-Mande o link com o número de destino no parâmetro `para`:
+Mande o link. Só isso:
 
 ```
-https://<usuario>.github.io/<repo>/?para=5583999998888
+https://<usuario>.github.io/<repo>/
 ```
 
-Formato: 55 + DDD + número, só dígitos. Ao tocar em **Enviar respostas**, abre a
-conversa do WhatsApp com o texto já montado.
+Ao tocar em **Enviar respostas**, abre o compartilhamento nativo do celular. A
+pessoa escolhe WhatsApp e o contato de destino, e o texto já vai montado.
 
-Sem o parâmetro, o botão usa o compartilhamento nativo do celular — funciona
-igual, só pede que a pessoa escolha o contato.
+Se o celular não suportar compartilhamento, o botão copia tudo para a área de
+transferência e é só colar na conversa.
 
-> Nenhum número de telefone fica gravado neste repositório. Ele vem só pela URL.
+> **Nenhum número de telefone existe neste repositório.** Não há destino
+> gravado em lugar nenhum — quem preenche escolhe para quem manda.
 
 ## Decisões técnicas
 

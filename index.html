@@ -244,16 +244,9 @@ input[type=file]::file-selector-button{
 </div>
 
 <script>
-/* Destino do envio.
-   NÃO fica escrito aqui — o repositório é público e número de telefone é
-   dado pessoal. Ele vem pela URL do link que o Victor manda:
-
-       .../index.html?para=5583999998888
-
-   Sem o parâmetro, usa o compartilhamento nativo do celular, que funciona
-   igual e deixa o Romero escolher o contato. */
-const WHATSAPP_DESTINO = (new URLSearchParams(location.search).get('para') || '')
-  .replace(/\D/g, '');
+/* Envio pelo compartilhamento nativo do celular.
+   Sem número de destino gravado em lugar nenhum: quem preenche escolhe o
+   contato na hora. Mantém o repositório sem nenhum dado pessoal. */
 
 const INSTALACAO = [
   ['inst_9',  'Instalação 9.000 BTU'],
@@ -407,15 +400,11 @@ document.getElementById('enviar').onclick = async () => {
   }
 
   if (arquivos.length) {
-    alert('Vou abrir o WhatsApp com as respostas.\n\n' +
-          'As fotos você anexa na conversa, direto por lá — o site não consegue ' +
-          'mandar arquivo sozinho neste celular.');
+    alert('Vou abrir o compartilhamento com as respostas.\n\n' +
+          'As fotos você anexa na conversa do WhatsApp, direto por lá — este ' +
+          'celular não deixa o site mandar arquivo sozinho.');
   }
 
-  if (WHATSAPP_DESTINO) {
-    location.href = `https://wa.me/${WHATSAPP_DESTINO}?text=${encodeURIComponent(texto)}`;
-    return;
-  }
   if (navigator.share) {
     try { await navigator.share({ text: texto }); return; } catch (e) { /* cancelou */ }
   }

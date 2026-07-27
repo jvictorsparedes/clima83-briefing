@@ -22,7 +22,7 @@ html{-webkit-text-size-adjust:100%}
 body{
   margin:0;background:#0f1218;color:#eef1f6;
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  padding-bottom:128px; /* espaço para a barra fixa */
+  padding-bottom:32px;
 }
 header{
   padding:26px 20px 20px;border-bottom:1px solid #242a36;
@@ -81,10 +81,13 @@ input[type=file]::file-selector-button{
   font-size:13px;color:#9aa4b8;background:#141a24;
   padding:9px 12px;border-radius:8px
 }
+/* Fica no fim da página, não fixo na tela.
+   Diverge da seção 6 do CLAUDE.md, que manda ação no terço inferior — e ali a
+   regra é certa, porque no recibo a ação é frequente e a meta é 10 toques.
+   Aqui é preenchimento único e longo: barra fixa roubaria ~128px de tela o
+   tempo todo, para uma ação que só faz sentido no fim. */
 .rodape{
-  position:fixed;left:0;right:0;bottom:0;z-index:30;
-  padding:14px 20px calc(14px + env(safe-area-inset-bottom));
-  background:#12151cf2;backdrop-filter:blur(10px);border-top:1px solid #242a36
+  margin:36px 20px 0;padding:22px 0 0;border-top:1px solid #242a36
 }
 .rodape button{
   width:100%;min-height:54px;border-radius:12px;border:0;

@@ -94,7 +94,6 @@ input[type=file]::file-selector-button{
   font-size:17px;font-weight:600;font-family:inherit;cursor:pointer
 }
 #enviar{background:#22a355;color:#fff}
-#copiar{background:#1c222e;color:#c9d2e2;border:1px solid #2c3444;margin-top:9px;min-height:48px;font-size:15px}
 .salvo{
   text-align:center;font-size:12.5px;color:#6b7789;
   margin-top:9px;min-height:16px
@@ -239,7 +238,6 @@ input[type=file]::file-selector-button{
 
 <div class="rodape">
   <button type="button" id="enviar">Enviar respostas</button>
-  <button type="button" id="copiar">Copiar tudo</button>
   <div class="salvo" id="salvo"></div>
 </div>
 
@@ -411,18 +409,15 @@ document.getElementById('enviar').onclick = async () => {
   copiar(texto);
 };
 
-document.getElementById('copiar').onclick = () => {
-  const texto = montarTexto();
-  if (!texto) { alert('Preenche pelo menos uma coisa antes.'); return; }
-  copiar(texto);
-};
-
+/* Plano B, usado só quando o celular não tem compartilhamento nativo.
+   Não existe botão para isto: quem tem suporte nunca chega aqui, e dois botões
+   com resultados diferentes (um leva anexo, o outro não) confundiria. */
 function copiar(texto) {
   const fim = () => {
-    const b = document.getElementById('copiar');
+    const b = document.getElementById('enviar');
     const antes = b.textContent;
-    b.textContent = 'Copiado — agora cola no WhatsApp';
-    setTimeout(() => b.textContent = antes, 2600);
+    b.textContent = 'Copiado — cole no WhatsApp';
+    setTimeout(() => b.textContent = antes, 3200);
   };
   if (navigator.clipboard) {
     navigator.clipboard.writeText(texto).then(fim, () => alternativa(texto, fim));

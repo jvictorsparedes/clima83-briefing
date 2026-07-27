@@ -59,12 +59,28 @@ input:focus,textarea:focus{
 }
 input::placeholder,textarea::placeholder{color:#5b6577}
 .opcoes{display:flex;flex-wrap:wrap;gap:9px}
+.opcoes.coluna{flex-direction:column}
+.opcoes.coluna button{width:100%;text-align:left;padding:0 16px}
 .opcoes button{
   min-height:48px;padding:0 16px;border-radius:10px;
   background:#171c26;color:#c9d2e2;border:1px solid #2c3444;
   font-size:15px;font-family:inherit;cursor:pointer
 }
 .opcoes button[aria-pressed=true]{background:#3b82f6;border-color:#3b82f6;color:#fff}
+input[type=file]{
+  width:100%;min-height:52px;background:#171c26;color:#c9d2e2;
+  border:1px dashed #3a4457;border-radius:10px;padding:14px;font-size:15px;
+  font-family:inherit
+}
+input[type=file]::file-selector-button{
+  min-height:40px;margin-right:12px;padding:0 14px;border-radius:8px;
+  border:0;background:#2c3444;color:#dfe5ef;font-size:15px;font-family:inherit
+}
+.lista-anexos{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.lista-anexos div{
+  font-size:13px;color:#9aa4b8;background:#141a24;
+  padding:9px 12px;border-radius:8px
+}
 .rodape{
   position:fixed;left:0;right:0;bottom:0;z-index:30;
   padding:14px 20px calc(14px + env(safe-area-inset-bottom));
@@ -178,6 +194,33 @@ input::placeholder,textarea::placeholder{color:#5b6577}
         <button type="button" value="Atende emergência dependendo do dia">Depende do dia</button>
         <button type="button" value="Atende emergência sempre que dá">Sempre que dá</button>
       </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Material que você tenha guardado</h2>
+    <p class="dica">Marca o que você tem. Não precisa procurar agora — só marcar
+      já ajuda.</p>
+
+    <div class="campo">
+      <div class="opcoes coluna" data-check="material">
+        <button type="button" value="Arquivo original da logo">Arquivo original da logo</button>
+        <button type="button" value="Foto do carro adesivado">Foto do carro adesivado</button>
+        <button type="button" value="Foto da camisa">Foto da camisa</button>
+        <button type="button" value="Fotos de serviço no celular">Fotos de serviço no celular</button>
+        <button type="button" value="Cartão de visita">Cartão de visita</button>
+        <button type="button" value="Artes que mandou fazer">Artes que mandou fazer</button>
+      </div>
+    </div>
+
+    <div class="campo" id="bloco-anexo">
+      <label for="anexos">Quer já mandar junto? Escolhe as fotos aqui</label>
+      <input type="file" id="anexos" multiple accept="image/*,application/pdf">
+      <div class="lista-anexos" id="lista-anexos"></div>
+      <p class="dica" style="margin-top:10px">
+        Se for o arquivo da logo, é melhor mandar pelo WhatsApp
+        <strong>como documento</strong> — assim não perde qualidade.
+      </p>
     </div>
   </section>
 
@@ -327,15 +370,45 @@ function montarTexto() {
   if (estado.emergencia) area.push(`• Emergência: ${estado.emergencia}`);
   if (area.length) linhas.push('*ONDE ATENDE*', ...area, '');
 
+  if ((estado.material || []).length)
+    linhas.push('*MATERIAL QUE TENHO*', ...estado.material.map(m => `• ${m}`), '');
+
   if (v('observacoes')) linhas.push('*OBSERVAÇÕES*', v('observacoes'), '');
 
   if (linhas.length <= 2) return null;
   return linhas.join('\n').trim();
 }
 
+/* ---- anexos: ficam só em memória, nada sobe para servidor ---- */
+let arquivos = [];
+const entradaAnexos = document.getElementById('anexos');
+entradaAnexos.addEventListener('change', () => {
+  arquivos = [...entradaAnexos.files];
+  const lista = document.getElementById('lista-anexos');
+  lista.innerHTML = arquivos.map(f =>
+    `<div>${f.name} — ${(f.size / 1024 / 1024).toFixed(1)} MB</div>`).join('');
+});
+
 document.getElementById('enviar').onclick = async () => {
   const texto = montarTexto();
   if (!texto) { alert('Preenche pelo menos uma coisa antes de enviar.'); return; }
+
+  /* Com arquivo escolhido, tenta o compartilhamento nativo, que manda texto e
+     foto juntos. Nem todo celular aceita arquivo aqui — por isso o teste com
+     canShare antes de tentar. */
+  if (arquivos.length && navigator.canShare && navigator.canShare({ files: arquivos })) {
+    try {
+      await navigator.share({ files: arquivos, text: texto });
+      return;
+    } catch (e) { /* cancelou ou falhou: cai para os caminhos abaixo */ }
+  }
+
+  if (arquivos.length) {
+    alert('Vou abrir o WhatsApp com as respostas.\n\n' +
+          'As fotos você anexa na conversa, direto por lá — o site não consegue ' +
+          'mandar arquivo sozinho neste celular.');
+  }
+
   if (WHATSAPP_DESTINO) {
     location.href = `https://wa.me/${WHATSAPP_DESTINO}?text=${encodeURIComponent(texto)}`;
     return;

@@ -40,6 +40,26 @@ Deliberadamente neutro. **Não usa cor nem tipografia da marca Clima83**, porque
 a identidade visual ainda não foi definida e é decisão do Claude Design. Isto é
 ferramenta interna, não peça de marca.
 
+## Anexos — como funciona, e o que não funciona
+
+GitHub Pages é hospedagem estática: **não recebe upload**. Nenhum arquivo é
+enviado para servidor nenhum, e nada fica gravado fora do celular de quem
+preenche.
+
+O que existe são dois caminhos, nesta ordem:
+
+1. **Compartilhamento nativo com arquivos.** Se o celular suportar
+   (`navigator.canShare({files})` — Chrome no Android e Safari no iOS
+   suportam), texto e fotos vão juntos numa tacada só
+2. **Se não suportar**, o formulário avisa e abre o WhatsApp só com o texto.
+   As fotos a pessoa anexa na própria conversa
+
+A lista "material que tenho" é independente disso: mesmo sem anexar nada, ela
+entra na mensagem, para quem recebe saber o que existe e pode cobrar depois.
+
+> Para o arquivo da logo, o certo é mandar **como documento** no WhatsApp.
+> Enviado como foto, o WhatsApp recomprime e a qualidade se perde.
+
 ## Arquivos
 
 - `index.html` — tudo: marcação, estilo e script. Sem dependência externa

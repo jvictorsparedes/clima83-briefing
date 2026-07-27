@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12151c">
+<title>Clima83 — Preços e Atendimento</title>
+<style>
+/* ------------------------------------------------------------------
+   Visual NEUTRO de propósito. Não usa cor nem fonte da marca Clima83.
+   Identidade visual é decisão do Claude Design (seção 16 do CLAUDE.md).
+   Isto é ferramenta interna, não peça de marca.
+
+   Padrão mobile obrigatório (seção 6):
+   - toque mínimo de 48px
+   - ações no terço inferior da tela
+   - fonte de 16px nos campos, senão o iOS dá zoom e quebra o layout
+   - contraste alto, para sobreviver à luz do sol
+   ------------------------------------------------------------------ */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:#0f1218;color:#eef1f6;
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding-bottom:128px; /* espaço para a barra fixa */
+}
+header{
+  padding:26px 20px 20px;border-bottom:1px solid #242a36;
+  background:#12151c;position:sticky;top:0;z-index:20
+}
+h1{margin:0 0 6px;font-size:19px;letter-spacing:-.01em}
+header p{margin:0;color:#9aa4b8;font-size:14px}
+.barra-progresso{height:4px;background:#242a36;border-radius:99px;margin-top:14px;overflow:hidden}
+.barra-progresso i{display:block;height:100%;width:0;background:#3b82f6;transition:width .25s}
+main{padding:8px 20px 20px}
+section{margin-top:30px}
+h2{
+  font-size:12px;text-transform:uppercase;letter-spacing:.09em;
+  color:#7f8ba3;margin:0 0 4px;font-weight:600
+}
+.dica{margin:0 0 16px;color:#9aa4b8;font-size:13.5px}
+.campo{margin-bottom:14px}
+label{display:block;font-size:15px;margin-bottom:7px;color:#dfe5ef}
+.entrada{position:relative;display:flex;align-items:center}
+.prefixo{
+  position:absolute;left:14px;color:#7f8ba3;font-size:16px;pointer-events:none
+}
+input[type=text],textarea{
+  width:100%;min-height:52px;             /* > 48px de toque */
+  background:#171c26;color:#fff;
+  border:1px solid #2c3444;border-radius:10px;
+  padding:14px 14px;font-size:16px;       /* 16px: evita zoom no iOS */
+  font-family:inherit;line-height:1.4
+}
+input.com-prefixo{padding-left:44px}
+textarea{min-height:88px;resize:vertical}
+input:focus,textarea:focus{
+  outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f633
+}
+input::placeholder,textarea::placeholder{color:#5b6577}
+.opcoes{display:flex;flex-wrap:wrap;gap:9px}
+.opcoes button{
+  min-height:48px;padding:0 16px;border-radius:10px;
+  background:#171c26;color:#c9d2e2;border:1px solid #2c3444;
+  font-size:15px;font-family:inherit;cursor:pointer
+}
+.opcoes button[aria-pressed=true]{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.rodape{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  padding:14px 20px calc(14px + env(safe-area-inset-bottom));
+  background:#12151cf2;backdrop-filter:blur(10px);border-top:1px solid #242a36
+}
+.rodape button{
+  width:100%;min-height:54px;border-radius:12px;border:0;
+  font-size:17px;font-weight:600;font-family:inherit;cursor:pointer
+}
+#enviar{background:#22a355;color:#fff}
+#copiar{background:#1c222e;color:#c9d2e2;border:1px solid #2c3444;margin-top:9px;min-height:48px;font-size:15px}
+.salvo{
+  text-align:center;font-size:12.5px;color:#6b7789;
+  margin-top:9px;min-height:16px
+}
+.aviso{
+  margin:20px 0 0;padding:13px 15px;border-left:3px solid #3b82f6;
+  background:#141a26;border-radius:0 8px 8px 0;font-size:13.5px;color:#c3ccdc
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Clima83 — Preços e Atendimento</h1>
+  <p>Preenche o que souber. O que não souber, deixa em branco.</p>
+  <div class="barra-progresso"><i id="progresso"></i></div>
+</header>
+
+<main>
+
+  <div class="aviso">
+    Vai salvando sozinho no seu celular. Se fechar sem querer ou a internet cair,
+    é só abrir de novo que tá tudo aqui.
+  </div>
+
+  <section>
+    <h2>Instalação</h2>
+    <p class="dica">Preço com material comum, sem contar a infra. Pode botar faixa
+      ("250 a 300") ou "a partir de".</p>
+    <div id="instalacao"></div>
+  </section>
+
+  <section>
+    <h2>Outros serviços</h2>
+    <div id="servicos"></div>
+  </section>
+
+  <section>
+    <h2>Sobre cobrança</h2>
+
+    <div class="campo">
+      <label>Cobra taxa de deslocamento?</label>
+      <div class="opcoes" data-radio="deslocamento">
+        <button type="button" value="Não cobra">Não cobro</button>
+        <button type="button" value="Cobra dependendo da distância">Depende da distância</button>
+        <button type="button" value="Cobra sempre">Cobro sempre</button>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="deslocamento_valor">Se cobra, quanto e a partir de onde?</label>
+      <textarea id="deslocamento_valor" placeholder="Ex: R$ 30 pra fora de Bayeux"></textarea>
+    </div>
+
+    <div class="campo">
+      <label for="parcelamento">Parcela no cartão? Em quantas vezes sem juros?</label>
+      <input type="text" id="parcelamento" placeholder="Ex: até 3x sem juros">
+    </div>
+
+    <div class="campo">
+      <label for="desconto">Dá desconto pra quem fecha mais de um aparelho?</label>
+      <textarea id="desconto" placeholder="Ex: a partir de 3 aparelhos dou 10%"></textarea>
+    </div>
+  </section>
+
+  <section>
+    <h2>Onde você atende</h2>
+
+    <div class="campo">
+      <label>Quais cidades você atende hoje?</label>
+      <div class="opcoes" data-check="cidades">
+        <button type="button" value="Bayeux">Bayeux</button>
+        <button type="button" value="João Pessoa">João Pessoa</button>
+        <button type="button" value="Santa Rita">Santa Rita</button>
+        <button type="button" value="Cabedelo">Cabedelo</button>
+        <button type="button" value="Conde">Conde</button>
+        <button type="button" value="Lucena">Lucena</button>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="outras_cidades">Atende mais alguma que não tá na lista?</label>
+      <input type="text" id="outras_cidades" placeholder="Ex: Cruz do Espírito Santo">
+    </div>
+
+    <div class="campo">
+      <label for="bairros">Quais bairros te dão mais serviço hoje?</label>
+      <textarea id="bairros" placeholder="Pode ir escrevendo os que lembrar, separados por vírgula"></textarea>
+    </div>
+
+    <div class="campo">
+      <label for="nao_vai">Tem lugar que você não vai, ou que só vai cobrando a mais?</label>
+      <textarea id="nao_vai" placeholder="Ex: não vou pro litoral sul"></textarea>
+    </div>
+
+    <div class="campo">
+      <label>Atende emergência no mesmo dia?</label>
+      <div class="opcoes" data-radio="emergencia">
+        <button type="button" value="Só com hora marcada">Só hora marcada</button>
+        <button type="button" value="Atende emergência dependendo do dia">Depende do dia</button>
+        <button type="button" value="Atende emergência sempre que dá">Sempre que dá</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Mais alguma coisa</h2>
+    <div class="campo">
+      <label for="observacoes">Algo que eu não perguntei e você acha importante?</label>
+      <textarea id="observacoes" placeholder="Opcional"></textarea>
+    </div>
+  </section>
+
+</main>
+
+<div class="rodape">
+  <button type="button" id="enviar">Enviar respostas</button>
+  <button type="button" id="copiar">Copiar tudo</button>
+  <div class="salvo" id="salvo"></div>
+</div>
+
+<script>
+/* Destino do envio.
+   NÃO fica escrito aqui — o repositório é público e número de telefone é
+   dado pessoal. Ele vem pela URL do link que o Victor manda:
+
+       .../index.html?para=5583999998888
+
+   Sem o parâmetro, usa o compartilhamento nativo do celular, que funciona
+   igual e deixa o Romero escolher o contato. */
+const WHATSAPP_DESTINO = (new URLSearchParams(location.search).get('para') || '')
+  .replace(/\D/g, '');
+
+const INSTALACAO = [
+  ['inst_9',  'Instalação 9.000 BTU'],
+  ['inst_12', 'Instalação 12.000 BTU'],
+  ['inst_18', 'Instalação 18.000 BTU'],
+  ['inst_24', 'Instalação 24.000 BTU'],
+  ['inst_30', 'Instalação 30.000 BTU'],
+  ['inst_pt', 'Piso-teto (a partir de)'],
+];
+
+const SERVICOS = [
+  ['hig_split', 'Higienização de split'],
+  ['hig_pt',    'Higienização de piso-teto'],
+  ['preventiva','Manutenção preventiva'],
+  ['visita',    'Visita / diagnóstico de defeito'],
+  ['gas',       'Carga de gás'],
+  ['desinst',   'Desinstalação'],
+  ['preinst',   'Pré-instalação (a infra)'],
+  ['eletrica',  'Serviço de parte elétrica'],
+];
+
+function montarPrecos(destino, lista) {
+  document.getElementById(destino).innerHTML = lista.map(([id, rotulo]) => `
+    <div class="campo">
+      <label for="${id}">${rotulo}</label>
+      <div class="entrada">
+        <span class="prefixo">R$</span>
+        <input type="text" inputmode="decimal" id="${id}"
+               class="com-prefixo" placeholder="0,00">
+      </div>
+    </div>`).join('');
+}
+montarPrecos('instalacao', INSTALACAO);
+montarPrecos('servicos', SERVICOS);
+
+const CHAVE = 'clima83_briefing_v1';
+const estado = JSON.parse(localStorage.getItem(CHAVE) || '{}');
+
+/* ---- restaura o que já foi preenchido ---- */
+document.querySelectorAll('input, textarea').forEach(el => {
+  if (estado[el.id]) el.value = estado[el.id];
+  el.addEventListener('input', () => { estado[el.id] = el.value; salvar(); });
+});
+
+document.querySelectorAll('[data-radio]').forEach(grupo => {
+  const chave = grupo.dataset.radio;
+  grupo.querySelectorAll('button').forEach(b => {
+    b.setAttribute('aria-pressed', estado[chave] === b.value ? 'true' : 'false');
+    b.onclick = () => {
+      estado[chave] = estado[chave] === b.value ? '' : b.value;
+      grupo.querySelectorAll('button').forEach(x =>
+        x.setAttribute('aria-pressed', estado[chave] === x.value ? 'true' : 'false'));
+      salvar();
+    };
+  });
+});
+
+document.querySelectorAll('[data-check]').forEach(grupo => {
+  const chave = grupo.dataset.check;
+  estado[chave] = estado[chave] || [];
+  grupo.querySelectorAll('button').forEach(b => {
+    b.setAttribute('aria-pressed', estado[chave].includes(b.value) ? 'true' : 'false');
+    b.onclick = () => {
+      const i = estado[chave].indexOf(b.value);
+      if (i >= 0) estado[chave].splice(i, 1); else estado[chave].push(b.value);
+      b.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true');
+      salvar();
+    };
+  });
+});
+
+let tempo;
+function salvar() {
+  localStorage.setItem(CHAVE, JSON.stringify(estado));
+  progresso();
+  const s = document.getElementById('salvo');
+  s.textContent = 'salvo';
+  clearTimeout(tempo);
+  tempo = setTimeout(() => s.textContent = '', 1600);
+}
+
+function progresso() {
+  const campos = document.querySelectorAll('input, textarea').length + 4;
+  let feitos = 0;
+  document.querySelectorAll('input, textarea').forEach(el => { if (el.value.trim()) feitos++; });
+  ['deslocamento','emergencia'].forEach(k => { if (estado[k]) feitos++; });
+  if ((estado.cidades || []).length) feitos += 2;
+  document.getElementById('progresso').style.width =
+    Math.min(100, Math.round(feitos / campos * 100)) + '%';
+}
+progresso();
+
+/* ---- monta o texto final ---- */
+function montarTexto() {
+  const v = id => (document.getElementById(id)?.value || '').trim();
+  const linhas = ['*CLIMA83 — PREÇOS E ATENDIMENTO*', ''];
+
+  const bloco = (titulo, lista) => {
+    const itens = lista.filter(([id]) => v(id)).map(([id, r]) => `• ${r}: R$ ${v(id)}`);
+    if (itens.length) linhas.push(`*${titulo}*`, ...itens, '');
+  };
+  bloco('INSTALAÇÃO', INSTALACAO);
+  bloco('OUTROS SERVIÇOS', SERVICOS);
+
+  const cobranca = [];
+  if (estado.deslocamento) cobranca.push(`• Deslocamento: ${estado.deslocamento}`);
+  if (v('deslocamento_valor')) cobranca.push(`• Detalhe: ${v('deslocamento_valor')}`);
+  if (v('parcelamento')) cobranca.push(`• Parcelamento: ${v('parcelamento')}`);
+  if (v('desconto')) cobranca.push(`• Desconto: ${v('desconto')}`);
+  if (cobranca.length) linhas.push('*COBRANÇA*', ...cobranca, '');
+
+  const area = [];
+  if ((estado.cidades || []).length) area.push(`• Cidades: ${estado.cidades.join(', ')}`);
+  if (v('outras_cidades')) area.push(`• Outras: ${v('outras_cidades')}`);
+  if (v('bairros')) area.push(`• Bairros com mais serviço: ${v('bairros')}`);
+  if (v('nao_vai')) area.push(`• Não atende / cobra a mais: ${v('nao_vai')}`);
+  if (estado.emergencia) area.push(`• Emergência: ${estado.emergencia}`);
+  if (area.length) linhas.push('*ONDE ATENDE*', ...area, '');
+
+  if (v('observacoes')) linhas.push('*OBSERVAÇÕES*', v('observacoes'), '');
+
+  if (linhas.length <= 2) return null;
+  return linhas.join('\n').trim();
+}
+
+document.getElementById('enviar').onclick = async () => {
+  const texto = montarTexto();
+  if (!texto) { alert('Preenche pelo menos uma coisa antes de enviar.'); return; }
+  if (WHATSAPP_DESTINO) {
+    location.href = `https://wa.me/${WHATSAPP_DESTINO}?text=${encodeURIComponent(texto)}`;
+    return;
+  }
+  if (navigator.share) {
+    try { await navigator.share({ text: texto }); return; } catch (e) { /* cancelou */ }
+  }
+  copiar(texto);
+};
+
+document.getElementById('copiar').onclick = () => {
+  const texto = montarTexto();
+  if (!texto) { alert('Preenche pelo menos uma coisa antes.'); return; }
+  copiar(texto);
+};
+
+function copiar(texto) {
+  const fim = () => {
+    const b = document.getElementById('copiar');
+    const antes = b.textContent;
+    b.textContent = 'Copiado — agora cola no WhatsApp';
+    setTimeout(() => b.textContent = antes, 2600);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(texto).then(fim, () => alternativa(texto, fim));
+  } else {
+    alternativa(texto, fim);
+  }
+}
+
+function alternativa(texto, fim) {
+  const t = document.createElement('textarea');
+  t.value = texto; t.style.position = 'fixed'; t.style.opacity = '0';
+  document.body.appendChild(t); t.select();
+  try { document.execCommand('copy'); fim(); } catch (e) { prompt('Copie o texto:', texto); }
+  t.remove();
+}
+</script>
+</body>
+</html>
